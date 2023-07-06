@@ -9,10 +9,12 @@ const DeleteIcon = require('../assets/icon/ic_delete.png');
 const Header = ({
   onDatePress,
   onDeletePress,
+  onBackPress,
   selectDate,
 }: {
   onDatePress: () => void;
   onDeletePress: () => void;
+  onBackPress: () => void;
   selectDate: string;
 }) => {
   // 오늘 날짜
@@ -41,7 +43,7 @@ const Header = ({
 
   return (
     <View style={styles.container}>
-      <Pressable style={styles.headerIconWrap}>
+      <Pressable style={styles.headerIconWrap} onPress={onBackPress}>
         <Image source={BackIcon} style={styles.headerIcon} />
       </Pressable>
       <Pressable style={styles.headerDateIconWrap} onPress={onDatePress}>
