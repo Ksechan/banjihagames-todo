@@ -4,7 +4,7 @@ const styles = StyleSheet.create({
   calendarStyle: {
     borderRadius: 8,
   },
-  deleteModalWrap: {
+  modalWrap: {
     borderRadius: 8,
     alignItems: 'center',
     paddingHorizontal: 8,
@@ -12,12 +12,12 @@ const styles = StyleSheet.create({
     paddingbottom: 8,
     backgroundColor: '#fff',
   },
-  deleteModalButtonWrap: {
+  modalButtonWrap: {
     flexDirection: 'row',
     marginTop: 50,
     marginBottom: 12,
   },
-  deleteModalButton: {
+  modalButton: {
     width: 100,
     height: 32,
     backgroundColor: '#f08080',
@@ -27,18 +27,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#111',
   },
-  deleteModalFirstButton: {
+  modalTransparentButton: {
     backgroundColor: 'transparent',
     marginRight: 12,
   },
   contentsWrap: {
     paddingVertical: 24,
     paddingHorizontal: 30,
+    height: '100%',
   },
   contentsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 12,
+    flex: 1,
+    paddingRight: 12,
   },
   checkbox: {
     width: 20,
@@ -51,6 +54,37 @@ const styles = StyleSheet.create({
   },
   flexRow: {
     flexDirection: 'row',
+    alignItems: 'center',
+  },
+  tagWrap: {
+    marginTop: 24,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  tag: {
+    borderWidth: 1,
+    borderColor: '#111',
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 6,
+    marginRight: 8,
+    marginBottom: 8,
+    height: 32,
+  },
+  tagInput: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'gray',
+    width: '80%',
+    paddingBottom: 10,
+  },
+  tagText: {
+    fontWeight: '500',
+  },
+  closeIconBox: {
+    width: 12,
+    height: 14,
+    marginLeft: 4,
   },
 });
 
