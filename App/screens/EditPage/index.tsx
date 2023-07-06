@@ -1,0 +1,171 @@
+import React, {useEffect, useState} from 'react';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  Pressable,
+  Image,
+  TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
+import styles from './style';
+import Header from '../../components/Header';
+
+import Modal from 'react-native-modal';
+import {Calendar} from 'react-native-calendars';
+import addItem from '../../utils/addItem';
+import getItem from '../../utils/getItem';
+
+const CheckboxIcon = require('../../assets/icon/checkbox_check.png');
+const CloseIcon = require('../../assets/icon/ic_close.png');
+
+const EditPage = () => {
+  // 모달 스위치
+  const [dateModalVisible, setDateModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [tagModalVisible, setTagModalVisible] = useState(false);
+  // 체크, 날짜, 제목입력
+  const [check, setCheck] = useState(false);
+  const [selectDate, setSelectDate] = useState('');
+  const [titleValue, setTitleValue] = useState('');
+  // 태그 입력
+  const [tagValue, setTagValue] = useState('');
+  const [tagArray, setTagArray] = useState<String[]>([]);
+  // store data
+
+  const tagDeleteHandler = (item: String) => {
+    setTagArray(tagArray.filter(el => el !== item));
+  };
+
+  const addItemHandler = async () => {
+    const previousTodos = await getItem('todoList');
+    const newTodos = {
+      check: check,
+      date: selectDate,
+      titleValue: titleValue,
+      tag: tagArray,
+    };
+    const updateTotos = [...previousTodos, newTodos];
+    addItem('todoList', updateTotos);
+  };
+
+  return (
+    <SafeAreaView>
+      <Header
+        onBackPress={addItemHandler}
+        onDatePress={() => setDateModalVisible(true)}
+        onDeletePress={() => setDeleteModalVisible(true)}
+        selectDate={selectDate}
+      />
+
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.contentsWrap}>
+          <View style={styles.flexRow}>
+            <Pressable onPress={() => setCheck(prev => !prev)}>
+              {check ? (
+                <Image source={CheckboxIcon} style={styles.checkbox} />
+              ) : (
+                <View style={[styles.checkbox, styles.noneCheck]} />
+              )}
+            </Pressable>
+            <TextInput
+              style={styles.contentsTitle}
+              placeholder="제목"
+              value={titleValue}
+              onChangeText={setTitleValue}
+              multiline
+              textAlignVertical="top"
+            />
+          </View>
+          <View style={styles.tagWrap}>
+            <Pressable
+              style={styles.tag}
+              onPress={() => setTagModalVisible(true)}>
+              <Text style={styles.tagText}>태그추가</Text>
+            </Pressable>
+
+            {tagArray.map((item, index) => {
+              return (
+                <View style={[styles.tag, styles.flexRow]} key={index}>
+                  <Text>{item}</Text>
+                  <Pressable
+                    onPress={() => {
+                      tagDeleteHandler(item);
+                    }}>
+                    <Image source={CloseIcon} style={styles.closeIconBox} />
+                  </Pressable>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+
+      {/* 캘린더 모달 */}
+      <Modal isVisible={dateModalVisible}>
+        <Calendar
+          onDayPress={day => {
+            setDateModalVisible(false);
+            setSelectDate(day.dateString);
+          }}
+          style={styles.calendarStyle}
+        />
+      </Modal>
+      {/* 삭제확인 모달 */}
+      <Modal isVisible={deleteModalVisible}>
+        <View style={styles.modalWrap}>
+          <Text>정말 삭제하시겠습니까?</Text>
+          <View style={styles.modalButtonWrap}>
+            <Pressable
+              style={[styles.modalButton, styles.modalTransparentButton]}
+              onPress={() => setDeleteModalVisible(false)}>
+              <Text>취소</Text>
+            </Pressable>
+            <Pressable
+              style={styles.modalButton}
+              onPress={() => setDeleteModalVisible(false)}>
+              <Text>삭제</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      {/* 태그입력 모달 */}
+      <Modal isVisible={tagModalVisible} avoidKeyboard>
+        <View style={styles.modalWrap}>
+          <TextInput
+            value={tagValue}
+            onChangeText={setTagValue}
+            style={styles.tagInput}
+            textAlign="center"
+            placeholder="태그를 입력해주세요."
+            autoFocus
+          />
+          <View style={styles.modalButtonWrap}>
+            <Pressable
+              style={[styles.modalButton, styles.modalTransparentButton]}
+              onPress={() => {
+                setTagModalVisible(false);
+                setTagValue('');
+              }}>
+              <Text>취소</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.modalButton, styles.modalTransparentButton]}
+              onPress={() => {
+                setTagModalVisible(false);
+                if (tagValue !== '') {
+                  setTagArray(prev => [...prev, tagValue]);
+                }
+                setTagValue('');
+              }}>
+              <Text>확인</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+};
+
+export default EditPage;
