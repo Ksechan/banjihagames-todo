@@ -10,7 +10,7 @@
 
 Try it out ⚡
 
-    $ git clone
+    $ git clone https://github.com/Ksechan/banjihagames-todo.git
 
     $ yarn install
 
