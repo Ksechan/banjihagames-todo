@@ -121,7 +121,6 @@ const EditPage = () => {
               placeholder="제목"
               value={titleValue}
               onChangeText={setTitleValue}
-              multiline
               textAlignVertical="top"
               autoFocus
             />
