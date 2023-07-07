@@ -55,7 +55,19 @@ const EditPage = () => {
     });
   };
 
+  const removeItemHandler = async (key: string) => {
+    try {
+      await AsyncStorage.removeItem(key);
+      return navigation.goBack();
+    } catch (exception) {
+      return false;
+    }
+  };
+
   const addItemHandler = async () => {
+    // AsyncStorage.getAllKeys()
+    //   .then(keys => AsyncStorage.multiRemove(keys))
+    //   .then(() => console.log('asdf'));
     const newTodos = {
       id: route !== undefined ? route.id : idCount + 1,
       check: check,
@@ -79,7 +91,7 @@ const EditPage = () => {
   }, []);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
       <Header
         onBackPress={() => {
           addItemHandler();
@@ -87,6 +99,7 @@ const EditPage = () => {
         onDatePress={() => setDateModalVisible(true)}
         onDeletePress={() => setDeleteModalVisible(true)}
         selectDate={selectDate}
+        edit={route !== undefined}
       />
 
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -147,6 +160,9 @@ const EditPage = () => {
         isVisible={deleteModalVisible}
         onCancelPress={() => setDeleteModalVisible(false)}
         onDeletePress={() => {
+          if (route !== undefined) {
+            removeItemHandler(route.id.toString());
+          }
           setDeleteModalVisible(false);
         }}
       />
