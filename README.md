@@ -21,6 +21,6 @@ Try it out ⚡
 
 ---
 
-노션 링크 : 
+### [노션 링크](https://noiseless-shape-ac8.notion.site/BanjihaGames-45f0c9298d564318a961f739f5cd781d?pvs=4)
 
 감사합니다.
