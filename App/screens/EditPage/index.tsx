@@ -11,16 +11,25 @@ import {
 } from 'react-native';
 import styles from './style';
 import Header from '../../components/Header';
+import addItem from '../../utils/addItem';
+import getItem from '../../utils/getItem';
+import {StackNavigatorParamList} from '../../types';
+import {ItemType} from '../../types';
 
 import Modal from 'react-native-modal';
 import {Calendar} from 'react-native-calendars';
-import addItem from '../../utils/addItem';
-import getItem from '../../utils/getItem';
+import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import DeleteModal from '../../components/DeleteModal';
 
 const CheckboxIcon = require('../../assets/icon/checkbox_check.png');
 const CloseIcon = require('../../assets/icon/ic_close.png');
 
 const EditPage = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<StackNavigatorParamList>>();
+  const route = useRoute<RouteProp<StackNavigatorParamList, 'edit'>>().params;
   // 모달 스위치
   const [dateModalVisible, setDateModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -33,27 +42,48 @@ const EditPage = () => {
   const [tagValue, setTagValue] = useState('');
   const [tagArray, setTagArray] = useState<String[]>([]);
   // store data
+  const [previousTodos, setPreviousTodos] = useState<ItemType[]>([]);
+  const [idCount, setIdCount] = useState(0);
 
   const tagDeleteHandler = (item: String) => {
     setTagArray(tagArray.filter(el => el !== item));
   };
 
+  const getData = async () => {
+    await AsyncStorage.getAllKeys().then(keys => {
+      setIdCount(keys.length);
+    });
+  };
+
   const addItemHandler = async () => {
-    const previousTodos = await getItem('todoList');
     const newTodos = {
+      id: route !== undefined ? route.id : idCount + 1,
       check: check,
       date: selectDate,
-      titleValue: titleValue,
+      title: titleValue,
       tag: tagArray,
     };
-    const updateTotos = [...previousTodos, newTodos];
-    addItem('todoList', updateTotos);
+
+    await addItem(`${newTodos.id}`, newTodos);
+    navigation.goBack();
   };
+
+  useEffect(() => {
+    getData();
+    if (route !== undefined) {
+      setTagArray(route.tag);
+      setCheck(route.check);
+      setSelectDate(route.date);
+      setTitleValue(route.title);
+    }
+  }, []);
 
   return (
     <SafeAreaView>
       <Header
-        onBackPress={addItemHandler}
+        onBackPress={() => {
+          addItemHandler();
+        }}
         onDatePress={() => setDateModalVisible(true)}
         onDeletePress={() => setDeleteModalVisible(true)}
         selectDate={selectDate}
@@ -113,23 +143,13 @@ const EditPage = () => {
         />
       </Modal>
       {/* 삭제확인 모달 */}
-      <Modal isVisible={deleteModalVisible}>
-        <View style={styles.modalWrap}>
-          <Text>정말 삭제하시겠습니까?</Text>
-          <View style={styles.modalButtonWrap}>
-            <Pressable
-              style={[styles.modalButton, styles.modalTransparentButton]}
-              onPress={() => setDeleteModalVisible(false)}>
-              <Text>취소</Text>
-            </Pressable>
-            <Pressable
-              style={styles.modalButton}
-              onPress={() => setDeleteModalVisible(false)}>
-              <Text>삭제</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
+      <DeleteModal
+        isVisible={deleteModalVisible}
+        onCancelPress={() => setDeleteModalVisible(false)}
+        onDeletePress={() => {
+          setDeleteModalVisible(false);
+        }}
+      />
       {/* 태그입력 모달 */}
       <Modal isVisible={tagModalVisible} avoidKeyboard>
         <View style={styles.modalWrap}>

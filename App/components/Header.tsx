@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleSheet, View, Image, Pressable, Text} from 'react-native';
 import dayjs from 'dayjs';
+import {today, dateHandler} from '../utils/todoDate';
 
 const BackIcon = require('../assets/icon/ic_back.png');
 const DateIcon = require('../assets/icon/ic_date.png');
@@ -17,29 +18,10 @@ const Header = ({
   onBackPress: () => void;
   selectDate: string;
 }) => {
-  // 오늘 날짜
-  const todayYear = dayjs().year();
-  const todayMonth = dayjs().month() + 1;
-  const todayDate = dayjs().date();
-  const today = `${todayYear}-${todayMonth}-${todayDate}`;
   // 선택된 날짜
   const expired_at = dayjs(selectDate);
   // 날짜 차이
   const result = expired_at.diff(today, 'day', true);
-
-  const dateHandler = () => {
-    if (result <= 0 && result > -7) {
-      if (result === 0) {
-        return '오늘';
-      } else {
-        return `${Math.abs(result)}일 연체`;
-      }
-    } else if (result > 0 && result < 7) {
-      return `${result}일 남음`;
-    } else {
-      return `${dayjs(selectDate).month() + 1}월 ${dayjs(selectDate).date()}일`;
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -49,8 +31,8 @@ const Header = ({
       <Pressable style={styles.headerDateIconWrap} onPress={onDatePress}>
         <Image source={DateIcon} style={styles.headerIcon} />
         <Text
-          style={[styles.headerDataText, result === 1 && styles.activeColor]}>
-          {selectDate === '' ? '날짜추가' : dateHandler()}
+          style={[styles.headerDataText, result <= 1 && styles.activeColor]}>
+          {selectDate === '' ? '날짜추가' : dateHandler({result, selectDate})}
         </Text>
       </Pressable>
       <Pressable style={styles.headerIconWrap} onPress={onDeletePress}>
@@ -94,6 +76,6 @@ const styles = StyleSheet.create({
     height: 24,
   },
   activeColor: {
-    color: 'red',
+    color: '#c21f1f',
   },
 });
