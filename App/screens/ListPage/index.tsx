@@ -12,6 +12,7 @@ import styles from './style';
 import {StackNavigatorParamList} from '../../types';
 import {ItemType} from '../../types';
 import {today, dateHandler} from '../../utils/todoDate';
+import addItem from '../../utils/addItem';
 
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -51,13 +52,26 @@ const ListPage = () => {
     setTodos(duplecateArray);
   };
 
-  const removeItem = async (key: string) => {
+  const removeItemHandler = async (key: string) => {
     try {
       await AsyncStorage.removeItem(key);
       return getData();
     } catch (exception) {
       return false;
     }
+  };
+
+  const addItemHandler = async (item: ItemType) => {
+    const newTodos = {
+      id: item.id,
+      check: !item.check,
+      date: item.date,
+      title: item.title,
+      tag: item.tag,
+    };
+
+    await addItem(`${newTodos.id}`, newTodos);
+    getData();
   };
 
   const renderRightActions = (
@@ -139,7 +153,10 @@ const ListPage = () => {
                           });
                         }}
                         style={styles.listWrap}>
-                        <Pressable>
+                        <Pressable
+                          onPress={() => {
+                            addItemHandler(item);
+                          }}>
                           {item.check ? (
                             <Image
                               source={CheckboxIcon}
@@ -150,7 +167,13 @@ const ListPage = () => {
                           )}
                         </Pressable>
                         <View style={styles.listTitleWrap}>
-                          <Text style={styles.listTitle}>{item.title}</Text>
+                          <Text
+                            style={[
+                              styles.listTitle,
+                              item.check && styles.completeTodo,
+                            ]}>
+                            {item.title}
+                          </Text>
                           <View style={styles.listTagWrap}>
                             {item.tag.map((el: string, index: number) => {
                               return (
@@ -166,7 +189,9 @@ const ListPage = () => {
                             styles.listDateText,
                             result <= 1 && styles.activeColor,
                           ]}>
-                          {dateHandler({result, selectDate: item.date})}
+                          {item.date === ''
+                            ? '날짜추가'
+                            : dateHandler({result, selectDate: item.date})}
                         </Text>
                       </Pressable>
                     </Swipeable>
@@ -187,7 +212,7 @@ const ListPage = () => {
         onCancelPress={() => setDeleteModalVisible(false)}
         onDeletePress={() => {
           if (deleteId !== null) {
-            removeItem(deleteId.toString());
+            removeItemHandler(deleteId.toString());
           }
           setDeleteModalVisible(false);
         }}

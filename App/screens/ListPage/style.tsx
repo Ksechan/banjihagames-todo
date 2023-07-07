@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   listTitleWrap: {
+    marginTop: 2,
     marginLeft: 8,
     flex: 1,
   },
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
   listTagWrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop: 8,
+    marginTop: 12,
   },
   listTag: {
     borderWidth: 1,
@@ -73,6 +74,12 @@ const styles = StyleSheet.create({
   },
   activeColor: {
     color: '#c21f1f',
+  },
+  completeTodo: {
+    color: 'gray',
+    textDecorationLine: 'line-through',
+    textDecorationStyle: 'solid',
+    textDecorationColor: 'gray',
   },
 });
 
