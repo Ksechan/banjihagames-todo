@@ -13,6 +13,7 @@ import {StackNavigatorParamList} from '../../types';
 import {ItemType} from '../../types';
 import {today, dateHandler} from '../../utils/todoDate';
 import addItem from '../../utils/addItem';
+import DeleteModal from '../../components/DeleteModal';
 
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -20,7 +21,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {GestureHandlerRootView, RectButton} from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import dayjs from 'dayjs';
-import DeleteModal from '../../components/DeleteModal';
 
 const FloatingIcon = require('../../assets/icon/btn_add.png');
 const CheckboxIcon = require('../../assets/icon/checkbox_check.png');
@@ -159,6 +159,7 @@ const ListPage = () => {
                           });
                         }}
                         style={styles.listWrap}>
+                        {/* 체크박스 */}
                         <Pressable
                           onPress={() => {
                             addItemHandler(item);
@@ -172,6 +173,7 @@ const ListPage = () => {
                             <View style={[styles.checkbox, styles.noneCheck]} />
                           )}
                         </Pressable>
+                        {/* 할 일 */}
                         <View style={styles.listTitleWrap}>
                           <Text
                             style={[
@@ -181,6 +183,7 @@ const ListPage = () => {
                             {item.title}
                           </Text>
                           <View style={styles.listTagWrap}>
+                            {/* 태그 */}
                             {item.tag.map((el: string, index: number) => {
                               return (
                                 <Pressable
@@ -208,6 +211,7 @@ const ListPage = () => {
                             })}
                           </View>
                         </View>
+                        {/* 만료일 */}
                         <Text
                           style={[
                             styles.listDateText,
