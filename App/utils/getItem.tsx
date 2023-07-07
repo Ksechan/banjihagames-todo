@@ -5,7 +5,6 @@ const getItem = async (key: string) => {
     const value = await AsyncStorage.getItem(key);
     if (value !== null) {
       const data = JSON.parse(value);
-      console.log(data);
       return data;
     }
     return [];
