@@ -49,10 +49,12 @@ const EditPage = () => {
 
   const getData = async () => {
     await AsyncStorage.getAllKeys().then(keys => {
-      const maxKey = keys.reduce((previous, current) => {
-        return Number(previous) > Number(current) ? previous : current;
-      });
-      setIdCount(Number(maxKey));
+      if (keys.length > 0) {
+        const maxKey = keys.reduce((previous, current) => {
+          return Number(previous) > Number(current) ? previous : current;
+        });
+        setIdCount(Number(maxKey));
+      }
     });
   };
 
@@ -78,14 +80,12 @@ const EditPage = () => {
       };
 
       await addItem(`${newTodos.id}`, newTodos);
-      console.log(idCount);
       navigation.goBack();
     }
   };
 
   useEffect(() => {
     getData();
-    console.log(idCount);
     if (route !== undefined) {
       setTagArray(route.tag);
       setCheck(route.check);
