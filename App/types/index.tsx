@@ -1,6 +1,5 @@
 export interface ItemType {
   id: number;
-  index: number;
   title: string;
   tag: String[];
   date: string;
@@ -12,7 +11,6 @@ export type StackNavigatorParamList = {
   edit:
     | {
         id: number;
-        index: number;
         title: string;
         tag: String[];
         date: string;
