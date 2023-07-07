@@ -30,9 +30,15 @@ const ListPage = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<StackNavigatorParamList>>();
   const isFocused = useIsFocused();
+  // todos list
   const [todos, setTodos] = useState<any[]>([]);
+  const [filterData, setFilterData] = useState<any[]>([]);
+  // 모달 스위치
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  // 모달 삭제
   const [deleteId, setDeleteId] = useState<null | number>(null);
+  // 태그 필터링
+  const [selectTag, setSelectTag] = useState('');
 
   const duplecateArray = new Array();
 
@@ -50,6 +56,7 @@ const ListPage = () => {
       }),
     );
     setTodos(duplecateArray);
+    setFilterData(duplecateArray);
   };
 
   const removeItemHandler = async (key: string) => {
@@ -88,7 +95,6 @@ const ListPage = () => {
         onPress={() => {
           setDeleteModalVisible(true);
           setDeleteId(id);
-          // removeItem(id.toString());
         }}
         style={styles.rightAction}>
         <Animated.Image
@@ -104,18 +110,19 @@ const ListPage = () => {
     );
   };
 
-  let rowRefs = new Map();
-
   useEffect(() => {
     getData();
+    setSelectTag('');
   }, [isFocused]);
+
+  let rowRefs = new Map();
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           {todos.length !== 0 ? (
-            todos
+            filterData
               .sort(function (a, b) {
                 return b.id - a.id;
               })
@@ -145,7 +152,6 @@ const ListPage = () => {
                         onPress={() => {
                           navigation.navigate('edit', {
                             id: item.id,
-                            index: index,
                             title: item.title,
                             tag: item.tag,
                             date: item.date,
@@ -177,7 +183,25 @@ const ListPage = () => {
                           <View style={styles.listTagWrap}>
                             {item.tag.map((el: string, index: number) => {
                               return (
-                                <Pressable key={index} style={styles.listTag}>
+                                <Pressable
+                                  key={index}
+                                  style={[
+                                    styles.listTag,
+                                    selectTag === el && styles.activeTag,
+                                  ]}
+                                  onPress={() => {
+                                    if (selectTag === el) {
+                                      setSelectTag('');
+                                      getData();
+                                    } else {
+                                      setSelectTag(el);
+                                      setFilterData(
+                                        todos.filter(item =>
+                                          item.tag.includes(el),
+                                        ),
+                                      );
+                                    }
+                                  }}>
                                   <Text>{el}</Text>
                                 </Pressable>
                               );
@@ -213,6 +237,7 @@ const ListPage = () => {
         onDeletePress={() => {
           if (deleteId !== null) {
             removeItemHandler(deleteId.toString());
+            setSelectTag('');
           }
           setDeleteModalVisible(false);
         }}

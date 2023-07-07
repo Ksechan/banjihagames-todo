@@ -81,6 +81,9 @@ const styles = StyleSheet.create({
     textDecorationStyle: 'solid',
     textDecorationColor: 'gray',
   },
+  activeTag: {
+    backgroundColor: '#ffcccc',
+  },
 });
 
 export default styles;
