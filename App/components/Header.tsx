@@ -12,11 +12,13 @@ const Header = ({
   onDeletePress,
   onBackPress,
   selectDate,
+  edit,
 }: {
   onDatePress: () => void;
   onDeletePress: () => void;
   onBackPress: () => void;
   selectDate: string;
+  edit: boolean;
 }) => {
   // 선택된 날짜
   const expired_at = dayjs(selectDate);
@@ -35,9 +37,13 @@ const Header = ({
           {selectDate === '' ? '날짜추가' : dateHandler({result, selectDate})}
         </Text>
       </Pressable>
-      <Pressable style={styles.headerIconWrap} onPress={onDeletePress}>
-        <Image source={DeleteIcon} style={styles.headerIcon} />
-      </Pressable>
+      {edit ? (
+        <Pressable style={styles.headerIconWrap} onPress={onDeletePress}>
+          <Image source={DeleteIcon} style={styles.headerIcon} />
+        </Pressable>
+      ) : (
+        <View style={{width: 48}} />
+      )}
     </View>
   );
 };
@@ -56,6 +62,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 16,
     paddingBottom: 6,
+    backgroundColor: '#fff',
   },
   headerIconWrap: {
     paddingHorizontal: 12,
