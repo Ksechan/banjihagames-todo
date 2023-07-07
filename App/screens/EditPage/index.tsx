@@ -34,6 +34,7 @@ const EditPage = () => {
   const [dateModalVisible, setDateModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [tagModalVisible, setTagModalVisible] = useState(false);
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   // 체크, 날짜, 제목입력
   const [check, setCheck] = useState(false);
   const [selectDate, setSelectDate] = useState('');
@@ -41,8 +42,7 @@ const EditPage = () => {
   // 태그 입력
   const [tagValue, setTagValue] = useState('');
   const [tagArray, setTagArray] = useState<String[]>([]);
-  // store data
-  const [previousTodos, setPreviousTodos] = useState<ItemType[]>([]);
+  // 삭제 ID
   const [idCount, setIdCount] = useState(0);
 
   const tagDeleteHandler = (item: String) => {
@@ -68,16 +68,20 @@ const EditPage = () => {
     // AsyncStorage.getAllKeys()
     //   .then(keys => AsyncStorage.multiRemove(keys))
     //   .then(() => console.log('asdf'));
-    const newTodos = {
-      id: route !== undefined ? route.id : idCount + 1,
-      check: check,
-      date: selectDate,
-      title: titleValue,
-      tag: tagArray,
-    };
+    if (titleValue === '') {
+      setConfirmModalVisible(true);
+    } else {
+      const newTodos = {
+        id: route !== undefined ? route.id : idCount + 1,
+        check: check,
+        date: selectDate,
+        title: titleValue,
+        tag: tagArray,
+      };
 
-    await addItem(`${newTodos.id}`, newTodos);
-    navigation.goBack();
+      await addItem(`${newTodos.id}`, newTodos);
+      navigation.goBack();
+    }
   };
 
   useEffect(() => {
@@ -119,6 +123,7 @@ const EditPage = () => {
               onChangeText={setTitleValue}
               multiline
               textAlignVertical="top"
+              autoFocus
             />
           </View>
           <View style={styles.tagWrap}>
@@ -194,6 +199,20 @@ const EditPage = () => {
                   setTagArray(prev => [...prev, tagValue]);
                 }
                 setTagValue('');
+              }}>
+              <Text>확인</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      <Modal isVisible={confirmModalVisible}>
+        <View style={styles.modalWrap}>
+          <Text>제목을 입력해주세요.</Text>
+          <View style={styles.modalButtonWrap}>
+            <Pressable
+              style={[styles.modalButton, styles.modalTransparentButton]}
+              onPress={() => {
+                setConfirmModalVisible(false);
               }}>
               <Text>확인</Text>
             </Pressable>
