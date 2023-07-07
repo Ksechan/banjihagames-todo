@@ -12,16 +12,14 @@ import {
 import styles from './style';
 import Header from '../../components/Header';
 import addItem from '../../utils/addItem';
-import getItem from '../../utils/getItem';
 import {StackNavigatorParamList} from '../../types';
-import {ItemType} from '../../types';
+import DeleteModal from '../../components/DeleteModal';
 
 import Modal from 'react-native-modal';
 import {Calendar} from 'react-native-calendars';
 import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DeleteModal from '../../components/DeleteModal';
 
 const CheckboxIcon = require('../../assets/icon/checkbox_check.png');
 const CloseIcon = require('../../assets/icon/ic_close.png');
@@ -34,6 +32,7 @@ const EditPage = () => {
   const [dateModalVisible, setDateModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [tagModalVisible, setTagModalVisible] = useState(false);
+  const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   // 체크, 날짜, 제목입력
   const [check, setCheck] = useState(false);
   const [selectDate, setSelectDate] = useState('');
@@ -41,8 +40,7 @@ const EditPage = () => {
   // 태그 입력
   const [tagValue, setTagValue] = useState('');
   const [tagArray, setTagArray] = useState<String[]>([]);
-  // store data
-  const [previousTodos, setPreviousTodos] = useState<ItemType[]>([]);
+  // 삭제 ID
   const [idCount, setIdCount] = useState(0);
 
   const tagDeleteHandler = (item: String) => {
@@ -51,25 +49,43 @@ const EditPage = () => {
 
   const getData = async () => {
     await AsyncStorage.getAllKeys().then(keys => {
-      setIdCount(keys.length);
+      const maxKey = keys.reduce((previous, current) => {
+        return Number(previous) > Number(current) ? previous : current;
+      });
+      setIdCount(Number(maxKey));
     });
   };
 
-  const addItemHandler = async () => {
-    const newTodos = {
-      id: route !== undefined ? route.id : idCount + 1,
-      check: check,
-      date: selectDate,
-      title: titleValue,
-      tag: tagArray,
-    };
+  const removeItemHandler = async (key: string) => {
+    try {
+      await AsyncStorage.removeItem(key);
+      return navigation.goBack();
+    } catch (exception) {
+      return false;
+    }
+  };
 
-    await addItem(`${newTodos.id}`, newTodos);
-    navigation.goBack();
+  const addItemHandler = async () => {
+    if (titleValue === '') {
+      setConfirmModalVisible(true);
+    } else {
+      const newTodos = {
+        id: route !== undefined ? route.id : idCount + 1,
+        check: check,
+        date: selectDate,
+        title: titleValue,
+        tag: tagArray,
+      };
+
+      await addItem(`${newTodos.id}`, newTodos);
+      console.log(idCount);
+      navigation.goBack();
+    }
   };
 
   useEffect(() => {
     getData();
+    console.log(idCount);
     if (route !== undefined) {
       setTagArray(route.tag);
       setCheck(route.check);
@@ -79,7 +95,7 @@ const EditPage = () => {
   }, []);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
       <Header
         onBackPress={() => {
           addItemHandler();
@@ -87,6 +103,7 @@ const EditPage = () => {
         onDatePress={() => setDateModalVisible(true)}
         onDeletePress={() => setDeleteModalVisible(true)}
         selectDate={selectDate}
+        edit={route !== undefined}
       />
 
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -104,8 +121,8 @@ const EditPage = () => {
               placeholder="제목"
               value={titleValue}
               onChangeText={setTitleValue}
-              multiline
               textAlignVertical="top"
+              autoFocus
             />
           </View>
           <View style={styles.tagWrap}>
@@ -147,6 +164,9 @@ const EditPage = () => {
         isVisible={deleteModalVisible}
         onCancelPress={() => setDeleteModalVisible(false)}
         onDeletePress={() => {
+          if (route !== undefined) {
+            removeItemHandler(route.id.toString());
+          }
           setDeleteModalVisible(false);
         }}
       />
@@ -178,6 +198,21 @@ const EditPage = () => {
                   setTagArray(prev => [...prev, tagValue]);
                 }
                 setTagValue('');
+              }}>
+              <Text>확인</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      {/* 제목 입력 모달 */}
+      <Modal isVisible={confirmModalVisible}>
+        <View style={styles.modalWrap}>
+          <Text>제목을 입력해주세요.</Text>
+          <View style={styles.modalButtonWrap}>
+            <Pressable
+              style={[styles.modalButton, styles.modalTransparentButton]}
+              onPress={() => {
+                setConfirmModalVisible(false);
               }}>
               <Text>확인</Text>
             </Pressable>
