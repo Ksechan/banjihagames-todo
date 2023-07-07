@@ -12,16 +12,14 @@ import {
 import styles from './style';
 import Header from '../../components/Header';
 import addItem from '../../utils/addItem';
-import getItem from '../../utils/getItem';
 import {StackNavigatorParamList} from '../../types';
-import {ItemType} from '../../types';
+import DeleteModal from '../../components/DeleteModal';
 
 import Modal from 'react-native-modal';
 import {Calendar} from 'react-native-calendars';
 import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DeleteModal from '../../components/DeleteModal';
 
 const CheckboxIcon = require('../../assets/icon/checkbox_check.png');
 const CloseIcon = require('../../assets/icon/ic_close.png');
@@ -51,7 +49,10 @@ const EditPage = () => {
 
   const getData = async () => {
     await AsyncStorage.getAllKeys().then(keys => {
-      setIdCount(keys.length);
+      const maxKey = keys.reduce((previous, current) => {
+        return Number(previous) > Number(current) ? previous : current;
+      });
+      setIdCount(Number(maxKey));
     });
   };
 
@@ -65,9 +66,6 @@ const EditPage = () => {
   };
 
   const addItemHandler = async () => {
-    // AsyncStorage.getAllKeys()
-    //   .then(keys => AsyncStorage.multiRemove(keys))
-    //   .then(() => console.log('asdf'));
     if (titleValue === '') {
       setConfirmModalVisible(true);
     } else {
@@ -80,12 +78,14 @@ const EditPage = () => {
       };
 
       await addItem(`${newTodos.id}`, newTodos);
+      console.log(idCount);
       navigation.goBack();
     }
   };
 
   useEffect(() => {
     getData();
+    console.log(idCount);
     if (route !== undefined) {
       setTagArray(route.tag);
       setCheck(route.check);
@@ -204,6 +204,7 @@ const EditPage = () => {
           </View>
         </View>
       </Modal>
+      {/* 제목 입력 모달 */}
       <Modal isVisible={confirmModalVisible}>
         <View style={styles.modalWrap}>
           <Text>제목을 입력해주세요.</Text>
