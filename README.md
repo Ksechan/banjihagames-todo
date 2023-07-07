@@ -10,13 +10,13 @@
 
 Try it out ⚡
 
-    git clone
+    $ git clone
 
-    yarn install
+    $ yarn install
 
-    cd ios && pod install && cd ..
+    $ cd ios && pod install && cd ..
 
-    yarn ios && yarn android
+    $ yarn ios && yarn android
 
 
 ---
